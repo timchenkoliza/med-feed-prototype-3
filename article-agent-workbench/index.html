@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Medical Article Agent Workbench</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">Яндекс Мед · Лента · internal prototype</div>
+        <h1>Article Agent Workbench</h1>
+        <p class="lede">Ссылка на материал → независимые агенты → facts/evidence → перевод → карточка → классификация → медицинский QA.</p>
+      </div>
+      <div class="version">pipeline v0.1</div>
+    </header>
+
+    <section class="panel input-panel">
+      <form id="analyze-form">
+        <label for="url">URL статьи</label>
+        <div class="input-row">
+          <input id="url" name="url" type="url" required autocomplete="off" value="https://www.fda.gov/news-events/press-announcements/fda-approves-first-drug-its-kind-polycythemia-vera-rare-blood-disorder" />
+          <button id="run-button" type="submit">Прогнать статью</button>
+        </div>
+        <p class="hint">Только публичные HTTP(S)-источники. Не вставляйте ссылки на внутренние системы и данные пациентов.</p>
+      </form>
+    </section>
+
+    <section class="panel" aria-labelledby="agents-title">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">Оркестрация</div>
+          <h2 id="agents-title">Агенты и handoff</h2>
+        </div>
+        <div id="run-status" class="status neutral">Ожидает запуска</div>
+      </div>
+      <div id="agent-grid" class="agent-grid">
+        <article class="agent" data-agent="Source Reader"><span>01</span><strong>Source Reader</strong><small>fetch + metadata + readable text</small><b>waiting</b></article>
+        <article class="agent" data-agent="Evidence Extractor"><span>02</span><strong>Evidence Extractor</strong><small>PICO / facts / evidence quotes</small><b>waiting</b></article>
+        <article class="agent" data-agent="Medical Translator"><span>03</span><strong>Medical Translator</strong><small>literal EN→RU baseline</small><b>waiting</b></article>
+        <article class="agent" data-agent="Product Medical Editor"><span>04</span><strong>Product Editor</strong><small>заголовок / Кратко / Для практики</small><b>waiting</b></article>
+        <article class="agent" data-agent="Clinical Classifier"><span>05</span><strong>Classifier</strong><small>specialty / topic / tags / study type</small><b>waiting</b></article>
+        <article class="agent" data-agent="Senior Medical QA"><span>06</span><strong>Senior Medical QA</strong><small>adversarial verification + gates</small><b>waiting</b></article>
+      </div>
+    </section>
+
+    <section id="error-panel" class="panel error-panel hidden" role="alert"></section>
+
+    <section id="result" class="hidden">
+      <section class="decision-row">
+        <article class="decision-card">
+          <div class="eyebrow">Финальный gate</div>
+          <div class="decision-main"><strong id="decision">—</strong><span id="run-duration"></span></div>
+          <p id="decision-note"></p>
+        </article>
+        <article class="panel actions-card">
+          <button id="copy-json" type="button" class="secondary">Копировать JSON</button>
+          <button id="download-json" type="button" class="secondary">Скачать JSON</button>
+          <button id="copy-tsv" type="button" class="secondary">Копировать строку для таблицы</button>
+        </article>
+      </section>
+
+      <section class="grid two">
+        <article class="panel">
+          <div class="eyebrow">Source layer</div>
+          <h2>Источник</h2>
+          <dl id="source-dl" class="kv"></dl>
+        </article>
+        <article class="panel">
+          <div class="eyebrow">Translation benchmark</div>
+          <h2>Перевод</h2>
+          <h3>Заголовок</h3><p id="translation-title" class="copy"></p>
+          <h3>Описание</h3><p id="translation-description" class="copy"></p>
+          <div id="translation-checks" class="checks"></div>
+        </article>
+      </section>
+
+      <section class="panel">
+        <div class="eyebrow">Ground truth layer</div>
+        <h2>Карточка фактов</h2>
+        <div id="fact-summary" class="fact-summary"></div>
+        <h3>Атомарные claims + evidence</h3>
+        <div id="claims" class="claims"></div>
+      </section>
+
+      <section class="grid two">
+        <article class="panel product-preview">
+          <div class="eyebrow">Product output</div>
+          <h2 id="product-title">—</h2>
+          <h3>Кратко</h3>
+          <div id="brief"></div>
+          <h3>Для практики</h3>
+          <div id="practice"></div>
+          <div id="product-tags" class="tags"></div>
+        </article>
+        <article class="panel">
+          <div class="eyebrow">Classification layer</div>
+          <h2>Классификация</h2>
+          <dl id="classification-dl" class="kv"></dl>
+        </article>
+      </section>
+
+      <section class="panel qa-panel">
+        <div class="eyebrow">Independent audit</div>
+        <h2>Medical QA</h2>
+        <div id="qa-scores" class="score-grid"></div>
+        <h3>Critical errors</h3>
+        <div id="critical-errors"></div>
+        <h3>Что исправить</h3>
+        <ul id="required-fixes"></ul>
+      </section>
+
+      <section class="panel">
+        <div class="eyebrow">Trace</div>
+        <h2>Лог агентов</h2>
+        <div id="trace-table" class="trace-table"></div>
+      </section>
+    </section>
+
+    <section class="panel history-panel">
+      <div class="section-head">
+        <div><div class="eyebrow">Local workspace</div><h2>Последние прогоны</h2></div>
+        <button id="clear-history" type="button" class="link-button">Очистить</button>
+      </div>
+      <div id="history"></div>
+    </section>
+  </main>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
