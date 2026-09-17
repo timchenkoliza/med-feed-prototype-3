@@ -1,0 +1,16 @@
+{
+  "name": "medical-article-agent-workbench",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "npx vercel dev",
+    "check": "node --check api/analyze.mjs && node --check lib/article.mjs && node --check lib/llm.mjs && node --check lib/prompts.mjs"
+  },
+  "dependencies": {
+    "cheerio": "^1.1.2"
+  }
+}
